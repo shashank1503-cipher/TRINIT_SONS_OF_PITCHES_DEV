@@ -23,8 +23,43 @@ def recluster(entity_name):
     df = pd.DataFrame(data)
     df.drop(['clustering_status'], axis=1, inplace=True)
     X = df.drop(['Labels'], axis=1)
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
+
+    ####################################################
+
+    X = X.dropna()
+    X = X.reset_index(drop=True)
+
+    first_col_name = X.columns[0]
+
+    for i in X:
+        if isinstance(X[i][0], str):
+
+            if ',' in X[i][0]:
+                X[i] = X[i].str.split(r"\s*,\s*", regex=True)
+                x = X.explode(i)
+                X = (
+                    pd.concat(
+                        [X.set_index(first_col_name), pd.crosstab(x[first_col_name], x[i])], axis=1
+                    )
+                    .reset_index()
+                    .drop(columns=i)
+                )
+
+    for i in X:
+        # print(X[i][3])
+        if isinstance(X[i][3], str):
+
+            # print("YES")
+            X[i] = pd.Categorical(X[i])
+            X[i] = X[i].cat.codes
+
+    ####################################################
+
+    print(X)
+
+    # scaler = StandardScaler()
+    # X = scaler.fit_transform(X)
+    # print(X)
     km = joblib.load('kmeans_mall_customers.sav')
     clusters = []
     for i in range(1, 11):
@@ -42,7 +77,9 @@ def recluster(entity_name):
         
     filename = 'kmeans_'+entity_name+'.sav'
     joblib.dump(km5, filename)
-    cluster_data = {"entity_name": "mall_customers", "cluster_file_name": filename,"cluster_type": "kmeans","clusters": cluster_map}
+    cluster_data = {"entity_name": entity_name, "cluster_file_name": filename,"cluster_type": "kmeans","clusters": cluster_map}
+    print(cluster_data)
     db['clusters'].update_one({'entity_name': entity_name}, {'$set': cluster_data}, upsert=True)
     return cluster_data
+
 

@@ -52,15 +52,15 @@ async def start_clustering(entity_name:str):
     else:
         recluster.recluster(entity_name)
         return {"status": "Clustering Done"}
-# @router.post("/add_entity/{entity_type}")
-# async def add_entity(file: UploadFile = File(...),entity_name: str = Form()):
-#     if entity_name in db.list_collection_names():
-#         return {"status": "Entity already exists"}
-#     else:
-#         data = pd.read_csv(file.file)
-#         data = data.to_dict(orient='records')
-#         db[entity_name].insert_many(data)
-#         db[entity_name].update_many({},{'$set': {'clustering_status': False}})
-#         return {"status": "Entity added"}
+@router.post("/add_entity/{entity_type}")
+async def add_entity(file: UploadFile = File(...),entity_name: str = Form()):
+    if entity_name in db.list_collection_names():
+        return {"status": "Entity already exists"}
+    else:
+        data = pd.read_csv(file.file)
+        data = data.to_dict(orient='records')
+        db[entity_name].insert_many(data)
+        db[entity_name].update_many({},{'$set': {'clustering_status': False}})
+        return {"status": "Entity added"}
 
     
