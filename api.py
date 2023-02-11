@@ -16,7 +16,7 @@ async def add_data_to_cluster(req:Request):
     data = data['data']
     fetch_data = db[entity_name].find_one({})
     keys = fetch_data.keys()
-    keys = [key for key in keys if key not in ['_id','Labels']]
+    keys = [key for key in keys if key not in ['_id','Labels','clustering_status']]
     if len(keys) != len(data.keys()):
         new_data = {}
         for key in keys:
