@@ -12,6 +12,8 @@ MONGO_URI = 'mongodb+srv://trinit:trinit123@trinit.hqhhlhx.mongodb.net/test'
 mongo_client = pymongo.MongoClient(MONGO_URI)
 db = mongo_client['cluster_db']
 
+
+
 # Load the customer data
 df = pd.read_csv("Mall_Customers.csv")
 

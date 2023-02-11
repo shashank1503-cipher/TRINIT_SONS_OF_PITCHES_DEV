@@ -14,13 +14,3 @@ def add_data_to_cluster(entity_name,data):
     new_data_cluster = cluster_model.predict(data)
     return new_data_cluster[0]
 
-keys = ["Age","Income","Score"]
-data = {}
-for key in keys:
-    data[key] = int(input(f"Enter {key}: "))
-print(data)
-df = pd.DataFrame(data,index=[0])
-# df.drop("CustomerID",axis=1,inplace=True)
-# df.drop("Gender",axis=1,inplace=True)
-cluster = add_data_to_cluster("mall_customers",df)
-print(cluster)
