@@ -74,12 +74,12 @@ def recluster(entity_name):
     cluster_map = {}
     for cluster in clusters:
         cluster_map[str(cluster)] = X[X['Labels'] == cluster].drop('Labels', axis=1).mean().to_dict()
-        
+        cluster_map[str(cluster)]['count'] = len(X[X['Labels'] == cluster])
     filename = 'kmeans_'+entity_name+'.sav'
     joblib.dump(km5, filename)
     cluster_data = {"entity_name": entity_name, "cluster_file_name": filename,"cluster_type": "kmeans","clusters": cluster_map}
-    print(cluster_data)
     db['clusters'].update_one({'entity_name': entity_name}, {'$set': cluster_data}, upsert=True)
     return cluster_data
-
+if __name__ == '__main__':
+    recluster('mall_customers')
 
