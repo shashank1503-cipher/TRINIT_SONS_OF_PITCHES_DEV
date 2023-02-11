@@ -41,6 +41,6 @@ async def get_data_from_cluster(entity_name:str):
 @router.get("/get_entities")
 async def get_entities():
     fetch_entities = db.list_collection_names()
-    fetch_entities.pop("clusters")
+    fetch_entities.remove('clusters')
     result = {"entities": fetch_entities}
     return result
