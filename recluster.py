@@ -2,12 +2,11 @@ from sklearn.cluster import DBSCAN
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import StandardScaler
 from kneed import KneeLocator
 import seaborn as sns
 import joblib
 import pymongo
-import json
 from sklearn.cluster import KMeans
 
 MONGO_URI = 'mongodb+srv://trinit:trinit123@trinit.hqhhlhx.mongodb.net/test'
@@ -24,13 +23,14 @@ def recluster(entity_name):
     df = pd.DataFrame(data)
     df.drop(['clustering_status'], axis=1, inplace=True)
     X = df.drop(['Labels'], axis=1)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
     km = joblib.load('kmeans_mall_customers.sav')
     clusters = []
     for i in range(1, 11):
         km = KMeans(n_clusters=i).fit(X)
         clusters.append(km.inertia_)
-        
-
+    
     kl = KneeLocator(range(1,11), clusters, curve='convex', direction='decreasing')
     n_clusters = kl.knee
     km5 = KMeans(n_clusters=n_clusters).fit(X)
@@ -45,3 +45,4 @@ def recluster(entity_name):
     cluster_data = {"entity_name": "mall_customers", "cluster_file_name": filename,"cluster_type": "kmeans","clusters": cluster_map}
     db['clusters'].update_one({'entity_name': entity_name}, {'$set': cluster_data}, upsert=True)
     return cluster_data
+
